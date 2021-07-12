@@ -3,6 +3,12 @@
 namespace alcamo\input_stream;
 
 /**
+ * @namespace alcamo::input_stream
+ *
+ * @brief Input stream vaguely inspired by C++ istream
+ */
+
+/**
  * @brief Input stream vaguely inspired by C++ istream
  *
  * @date Last reviewed 2021-06-15
