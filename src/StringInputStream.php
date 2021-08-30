@@ -33,7 +33,7 @@ class StringInputStream implements SeekableInputStreamInterface
     }
 
     /// Return entire stream data
-    public function __toString()
+    public function __toString(): string
     {
         return $this->text_;
     }
