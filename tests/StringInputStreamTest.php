@@ -88,8 +88,7 @@ EOT;
 
         $this->expectException(Eof::class);
         $this->expectExceptionMessage(
-            'Eof in ' . StringInputStream::class
-            . ': requested 6 units, available 5'
+            'Failed to read 6 unit(s) from stream "Lorem ipsum", only 5 units available'
         );
 
         $stream->extract(6);
@@ -105,9 +104,7 @@ EOT;
         $stream->putback();
 
         $this->expectException(Underflow::class);
-        $this->expectExceptionMessage(
-            'Underflow in ' . StringInputStream::class
-        );
+        $this->expectExceptionMessage('Underflow in stream "Foo"');
 
         $stream->putback();
     }

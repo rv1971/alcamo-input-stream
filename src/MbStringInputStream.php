@@ -53,7 +53,14 @@ class MbStringInputStream extends StringInputStream
 
         if ($this->offset_ + $count > $this->size_) {
             // throw already documented in InputStreamInterface::extract()
-            throw new Eof($this, $count, $this->size_ - $this->offset_);
+            throw (new Eof())->setMessageContext(
+                [
+                    'objectType' => 'stream',
+                    'object' => $this,
+                    'requestedUnits' => $count,
+                    'availableUnits' => $this->size_ - $this->offset_
+                ]
+            );
         }
 
         $this->offset_ += $count;

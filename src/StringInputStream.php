@@ -59,7 +59,14 @@ class StringInputStream implements SeekableInputStreamInterface
 
         if (!isset($this->text_[$this->offset_ + $count - 1])) {
             // throw already documented in InputStreamInterface::extract()
-            throw new Eof($this, $count, strlen($this->text_) - $this->offset_);
+            throw (new Eof())->setMessageContext(
+                [
+                    'objectType' => 'stream',
+                    'object' => $this,
+                    'requestedUnits' => $count,
+                    'availableUnits' => strlen($this->text_) - $this->offset_
+                ]
+            );
         }
 
         $result = substr($this->text_, $this->offset_, $count);
@@ -76,7 +83,12 @@ class StringInputStream implements SeekableInputStreamInterface
             $this->offset_--;
         } else {
             // throw already documented in InputStreamInterface::extract()
-            throw new Underflow($this);
+            throw (new Underflow())->setMessageContext(
+                [
+                    'objectType' => 'stream',
+                    'object' => $this
+                ]
+            );
         }
     }
 
