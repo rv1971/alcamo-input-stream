@@ -62,7 +62,6 @@ class StringInputStream implements SeekableInputStreamInterface
             throw (new Eof())->setMessageContext(
                 [
                     'objectType' => 'stream',
-                    'object' => $this,
                     'requestedUnits' => $count,
                     'availableUnits' => strlen($this->text_) - $this->offset_
                 ]
@@ -83,12 +82,8 @@ class StringInputStream implements SeekableInputStreamInterface
             $this->offset_--;
         } else {
             // throw already documented in InputStreamInterface::extract()
-            throw (new Underflow())->setMessageContext(
-                [
-                    'objectType' => 'stream',
-                    'object' => $this
-                ]
-            );
+            throw (new Underflow())
+                ->setMessageContext(['objectType' => 'stream']);
         }
     }
 

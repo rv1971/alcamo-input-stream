@@ -56,7 +56,6 @@ class MbStringInputStream extends StringInputStream
             throw (new Eof())->setMessageContext(
                 [
                     'objectType' => 'stream',
-                    'object' => $this,
                     'requestedUnits' => $count,
                     'availableUnits' => $this->size_ - $this->offset_
                 ]
