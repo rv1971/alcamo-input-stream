@@ -16,6 +16,7 @@ class MbStringInputStream extends StringInputStream
 {
     protected $size_; ///< int
 
+    /** copydoc alcamo::input_stream::StringInputStream::__construct() */
     public function __construct(string $text, ?int $offset = null)
     {
         parent::__construct($text, $offset);
@@ -28,13 +29,11 @@ class MbStringInputStream extends StringInputStream
         $this->size_ = mb_strlen($this->text_);
     }
 
-    /// @copydoc InputStreamInterface::isGood()
     public function isGood(): bool
     {
         return $this->offset_ < $this->size_;
     }
 
-    /// @copydoc InputStreamInterface::peek()
     public function peek(): ?string
     {
         return $this->offset_ < $this->size_
@@ -42,7 +41,6 @@ class MbStringInputStream extends StringInputStream
             : null;
     }
 
-    /// @copydoc InputStreamInterface::extract()
     public function extract(int $count = 1): ?string
     {
         if ($this->offset_ >= $this->size_) {
@@ -52,7 +50,7 @@ class MbStringInputStream extends StringInputStream
         $result = mb_substr($this->text_, $this->offset_, $count);
 
         if ($this->offset_ + $count > $this->size_) {
-            // throw already documented in InputStreamInterface::extract()
+            /* throw already documented in InputStreamInterface::extract() */
             throw (new Eof())->setMessageContext(
                 [
                     'objectType' => 'stream',
@@ -67,7 +65,6 @@ class MbStringInputStream extends StringInputStream
         return $result;
     }
 
-    /// @copydoc InputStreamInterface::extractUntil()
     public function extractUntil(
         string $sep,
         ?int $maxCount = null,
@@ -81,7 +78,7 @@ class MbStringInputStream extends StringInputStream
         $sepPos = mb_strpos($this->text_, $sep, $this->offset_);
 
         if ($sepPos === false) {
-            // If not found, return $maxCount or the entire remainder.
+            /* If not found, return $maxCount or the entire remainder. */
             if (
                 isset($maxCount)
                 && $this->offset_ + $maxCount <= mb_strlen($this->text_)
@@ -93,7 +90,7 @@ class MbStringInputStream extends StringInputStream
                 $this->offset_ = $this->size_;
             }
         } else {
-            // If found, return $maxCount or until $sep.
+            /* If found, return $maxCount or until $sep. */
             if ($extractSep) {
                 $sepPos += mb_strlen($sep);
             }
@@ -118,13 +115,11 @@ class MbStringInputStream extends StringInputStream
         return $result;
     }
 
-    /// @copydoc SeekableInputStreamInterface::getSize()
     public function getSize(): int
     {
         return $this->size_;
     }
 
-    /// @copydoc SeekableInputStreamInterface::getRemainder()
     public function getRemainder(): ?string
     {
         return ($this->offset_ < $this->size_)
@@ -132,7 +127,6 @@ class MbStringInputStream extends StringInputStream
             : null;
     }
 
-    /// @copydoc SeekableInputStreamInterface::extractRemainder()
     public function extractRemainder(): ?string
     {
         if ($this->offset_ < $this->size_) {
@@ -144,7 +138,6 @@ class MbStringInputStream extends StringInputStream
         }
     }
 
-    /// @copydoc StringInputStream::extractRegexp()
     public function extractRegexp(string $regexp, ?int $matchNo = 0): ?string
     {
         if (

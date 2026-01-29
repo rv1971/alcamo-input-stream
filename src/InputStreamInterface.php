@@ -50,8 +50,7 @@ interface InputStreamInterface
      * @param $maxCount Maximum number of characters to extract, including
      * the separator if $extractSep is true. `null` means unlimited.
      *
-     * @param $extractSep Whether to extract the separator itself and to
-     * include it in the result.
+     * @param $extractSep Whether to extract the separator itself.
      *
      * @param $discardSep If $extractSep is `true`, whether to discard the
      * separator instead of including it in the result.

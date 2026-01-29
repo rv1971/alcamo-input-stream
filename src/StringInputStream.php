@@ -38,19 +38,16 @@ class StringInputStream implements SeekableInputStreamInterface
         return $this->text_;
     }
 
-    /// @copydoc InputStreamInterface::isGood()
     public function isGood(): bool
     {
         return isset($this->text_[$this->offset_]);
     }
 
-    /// @copydoc InputStreamInterface::peek()
     public function peek(): ?string
     {
         return $this->text_[$this->offset_] ?? null;
     }
 
-    /// @copydoc InputStreamInterface::extract()
     public function extract(int $count = 1): ?string
     {
         if (!isset($this->text_[$this->offset_])) {
@@ -58,7 +55,7 @@ class StringInputStream implements SeekableInputStreamInterface
         }
 
         if (!isset($this->text_[$this->offset_ + $count - 1])) {
-            // throw already documented in InputStreamInterface::extract()
+            /* throw already documented in InputStreamInterface::extract() */
             throw (new Eof())->setMessageContext(
                 [
                     'objectType' => 'stream',
@@ -75,19 +72,17 @@ class StringInputStream implements SeekableInputStreamInterface
         return $result;
     }
 
-    /// @copydoc InputStreamInterface::putback()
     public function putback(): void
     {
         if ($this->offset_) {
             $this->offset_--;
         } else {
-            // throw already documented in InputStreamInterface::extract()
+            /* throw already documented in InputStreamInterface::putback() */
             throw (new Underflow())
                 ->setMessageContext(['objectType' => 'stream']);
         }
     }
 
-    /// @copydoc InputStreamInterface::extractUntil()
     public function extractUntil(
         string $sep,
         ?int $maxCount = null,
@@ -101,7 +96,7 @@ class StringInputStream implements SeekableInputStreamInterface
         $sepPos = strpos($this->text_, $sep, $this->offset_);
 
         if ($sepPos === false) {
-            // If not found, return $maxCount or the entire remainder.
+            /* If not found, return $maxCount or the entire remainder. */
             if (
                 isset($maxCount)
                 && isset($this->text_[$this->offset_ + $maxCount])
@@ -113,7 +108,7 @@ class StringInputStream implements SeekableInputStreamInterface
                 $this->offset_ = strlen($this->text_);
             }
         } else {
-            // If found, return $maxCount or until $sep.
+            /* If found, return $maxCount or until $sep. */
             if ($extractSep) {
                 $sepPos += strlen($sep);
             }
@@ -138,25 +133,21 @@ class StringInputStream implements SeekableInputStreamInterface
         return $result;
     }
 
-    /// @copydoc SeekableInputStreamInterface::getOffset()
     public function getOffset(): int
     {
         return $this->offset_;
     }
 
-    /// @copydoc SeekableInputStreamInterface::getSize()
     public function getSize(): int
     {
         return strlen($this->text_);
     }
 
-    /// @copydoc SeekableInputStreamInterface::getContents()
     public function getContents(): string
     {
         return $this->text_;
     }
 
-    /// @copydoc SeekableInputStreamInterface::getRemainder()
     public function getRemainder(): ?string
     {
         return isset($this->text_[$this->offset_])
@@ -164,7 +155,6 @@ class StringInputStream implements SeekableInputStreamInterface
             : null;
     }
 
-    /// @copydoc SeekableInputStreamInterface::extractRemainder()
     public function extractRemainder(): ?string
     {
         if (isset($this->text_[$this->offset_])) {
