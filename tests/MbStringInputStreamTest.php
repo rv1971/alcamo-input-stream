@@ -50,7 +50,8 @@ class MbStringInputStreamTest extends TestCase
 
         $this->expectException(Eof::class);
         $this->expectExceptionMessage(
-            'Failed to read 6 unit(s) from stream "Löræm ipšum", only 5 units available'
+            'Failed to read 6 unit(s) from stream '
+                . '<alcamo\input_stream\MbStringInputStream>"Löræm ipšum", only 5 unit(s) available'
         );
 
         $stream->extract(6);
@@ -66,7 +67,9 @@ class MbStringInputStreamTest extends TestCase
         $stream->putback();
 
         $this->expectException(Underflow::class);
-        $this->expectExceptionMessage('Underflow in stream "ďőő"');
+        $this->expectExceptionMessage(
+            'Underflow in stream <alcamo\input_stream\MbStringInputStream>"ďőő"'
+        );
 
         $stream->putback();
     }
