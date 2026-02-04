@@ -80,6 +80,43 @@ EOT;
         $this->assertFalse($stream->isGood());
     }
 
+    public function testExtractWsAndComments()
+    {
+        $text = <<<EOT
+Lorem ipsum dolor sit amet, ; first line
+  consetetur sadipscing elitr;second line
+    ; further comment
+sed diam nonumy eirmod tempor invidunt
+EOT;
+
+        $stream = new StringInputStream($text);
+
+        $this->assertSame(
+            'Lorem ipsum dolor sit amet,',
+            $stream->extractRegexp('/[^,]*,/')
+        );
+
+        $this->assertSame(
+            " ; first line\n  ",
+            $stream->extractWsAndComments()
+        );
+
+        $this->assertSame(
+            'consetetur sadipscing elitr',
+            $stream->extractRegexp('/[^;]*/')
+        );
+
+        $this->assertSame(
+            ";second line\n    ; further comment\n",
+            $stream->extractWsAndComments()
+        );
+
+        $this->assertSame(
+            "sed diam nonumy eirmod tempor invidunt",
+            $stream->extractRemainder()
+        );
+    }
+
     public function testEof()
     {
         $stream = new StringInputStream('Lorem ipsum');

@@ -11,12 +11,17 @@ use alcamo\exception\{Eof, Underflow};
  */
 class StringInputStream implements SeekableInputStreamInterface
 {
-    /**
-     * @brief Regexp identifying white space in extractWs()
-     *
-     * May be redefined in derived classes to treat comments as whitespace.
-     */
+    /// Regexp identifying white space in extractWs()
     public const WS_REGEXP = '/^\s+/';
+
+    /**
+     * @brief Regexp identifying white space in extractWsAndComments()
+     *
+     * Here: Optional whitespace, followed by zero or more occurences of: a
+     * semicolon which introduces a comment that extends up to a linefeed,
+     * optionally followed by whitespace.
+     */
+    public const WS_AND_COMMENTS_REGEXP = '/^\s*(;[^\n]*\n+\s*)*/';
 
     protected $text_;   ///< string
     protected $offset_; ///< int
@@ -193,5 +198,10 @@ class StringInputStream implements SeekableInputStreamInterface
     public function extractWs(): ?string
     {
         return $this->extractRegexp(static::WS_REGEXP);
+    }
+
+    public function extractWsAndComments(): ?string
+    {
+        return $this->extractRegexp(static::WS_AND_COMMENTS_REGEXP);
     }
 }
