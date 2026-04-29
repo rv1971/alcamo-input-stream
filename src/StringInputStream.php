@@ -195,13 +195,44 @@ class StringInputStream implements SeekableInputStreamInterface
         }
     }
 
+    /**
+     * @brief Extract whitespace according to regexp
+     * alcamo::input_stream::StringInputStream::WS_REGEXP
+     */
     public function extractWs(): ?string
     {
         return $this->extractRegexp(static::WS_REGEXP);
     }
 
+    /**
+     * @brief Extract whitespace and comments according to regexp
+     * alcamo::input_stream::StringInputStream::WS_AND_COMMENTS_REGEXP
+     */
     public function extractWsAndComments(): ?string
     {
         return $this->extractRegexp(static::WS_AND_COMMENTS_REGEXP);
+    }
+
+    /**
+     * Extract the next token, which spans either from an opening quote to the
+     * next quote of the same type, or up to the separator, without extracting
+     * the separator itself. This allows for the separator to appear within
+     * quoted strings. Quoted strings containing quotes of their own type are
+     * not supported.
+     */
+    public function extractToken(string $sep): ?string
+    {
+        switch ($this->peek()) {
+            case '"':
+                return $this->extract() . $this->extractUntil('"', null, true);
+                break;
+
+            case "'":
+                return $this->extract() . $this->extractUntil("'", null, true);
+                break;
+
+            default:
+                return $this->extractUntil($sep);
+        }
     }
 }
