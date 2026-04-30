@@ -149,6 +149,12 @@ EOT;
         $this->assertSame('', $stream->extractToken(null, true));
         $this->assertSame('\'qux "quux\'', $stream->extractToken(';', true));
         $this->assertNull($stream->extractToken(' '));
+
+        $stream = new StringInputStream('foo');
+        $this->assertSame('foo', $stream->extractToken(null, true));
+
+        $stream = new StringInputStream('foo');
+        $this->assertSame('foo', $stream->extractToken(',', true));
     }
 
     public function testEof()
