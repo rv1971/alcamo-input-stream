@@ -11,8 +11,8 @@ use alcamo\exception\{Eof, Underflow};
  */
 class StringInputStream implements SeekableInputStreamInterface
 {
-    /// Regexp identifying white space in extractWs()
-    public const WS_REGEXP = '/^\s+/';
+    /// White space charcaters in extractWs()
+    public const WS_CHARS = " \n\r\t\v\x00";
 
     /**
      * @brief Regexp identifying white space in extractWsAndComments()
@@ -196,12 +196,22 @@ class StringInputStream implements SeekableInputStreamInterface
     }
 
     /**
-     * @brief Extract whitespace according to regexp
-     * alcamo::input_stream::StringInputStream::WS_REGEXP
+     * @brief Extract whitespace characters according to
+     * alcamo::input_stream::StringInputStream::WS_CHARS
      */
     public function extractWs(): ?string
     {
-        return $this->extractRegexp(static::WS_REGEXP);
+        if (!isset($this->text_[$this->offset_])) {
+            return null;
+        }
+
+        $len = strspn($this->text_, static::WS_CHARS, $this->offset_);
+
+        $result = substr($this->text_, $this->offset_, $len);
+
+        $this->offset_ += $len;
+
+        return $result;
     }
 
     /**
