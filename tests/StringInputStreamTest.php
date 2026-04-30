@@ -141,13 +141,13 @@ EOT;
 
     public function testExtractToken(): void
     {
-        $stream = new StringInputStream("foo \"bar' baz\" 'qux \"quux'");
+        $stream = new StringInputStream("foo \"bar' baz\"\t\r\n 'qux \"quux';");
 
         $this->assertSame('foo', $stream->extractToken(' '));
         $this->assertSame(' ', $stream->extractWs());
-        $this->assertSame('"bar\' baz"', $stream->extractToken(' '));
-        $this->assertSame(' ', $stream->extractWs());
-        $this->assertSame('\'qux "quux\'', $stream->extractToken(' '));
+        $this->assertSame('"bar\' baz"', $stream->extractToken());
+        $this->assertSame('', $stream->extractToken(null, true));
+        $this->assertSame('\'qux "quux\'', $stream->extractToken(';', true));
         $this->assertNull($stream->extractToken(' '));
     }
 

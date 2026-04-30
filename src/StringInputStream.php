@@ -272,20 +272,41 @@ class StringInputStream implements SeekableInputStreamInterface
      * the separator itself. This allows for the separator to appear within
      * quoted strings. Quoted strings containing quotes of their own type are
      * not supported.
+     *
+     * @param $sep Separator string. If `null`, separator is whitespace.
+     *
+     * @param $extractSep Whether to extract the separator, if any. Applies to
+     * all kinds of tokens, including the quoted ones.
+     *
+     * @return The token including quotes, if any, but not including the
+     * separator, if extracted.
      */
-    public function extractToken(string $sep): ?string
-    {
+    public function extractToken(
+        ?string $sep = null,
+        ?bool $extractSep = null
+    ): ?string {
+        $char = $this->peek();
+
         switch ($this->peek()) {
             case '"':
-                return $this->extract() . $this->extractUntil('"', null, true);
-                break;
-
             case "'":
-                return $this->extract() . $this->extractUntil("'", null, true);
-                break;
+                $result =
+                    $this->extract() . $this->extractUntil($char, null, true);
+
+                if ($extractSep) {
+                    if (isset($sep)) {
+                        $this->extract(strlen($sep));
+                    } else {
+                        $this->extractWs();
+                    }
+                }
+
+                return $result;
 
             default:
-                return $this->extractUntil($sep);
+                return isset($sep)
+                    ? $this->extractUntil($sep, null, $extractSep, $extractSep)
+                    : $this->extractUntilWs(null, $extractSep, $extractSep);
         }
     }
 }
