@@ -3,7 +3,7 @@
 namespace alcamo\input_stream;
 
 use PHPUnit\Framework\TestCase;
-use alcamo\exception\{Eof, Underflow};
+use alcamo\exception\{Eof, SyntaxError, Underflow};
 
 class StringInputStreamTest extends TestCase
 {
@@ -80,7 +80,40 @@ EOT;
         $this->assertFalse($stream->isGood());
     }
 
-    public function testExtractWsAndComments()
+    public function testExtractFixedString(): void
+    {
+        $stream = new StringInputStream('foo');
+
+        $this->assertSame('foo', $stream->extractFixedString('foo'));
+
+        $this->assertNull($stream->extractFixedString('bar'));
+
+        $stream = new StringInputStream('foo');
+
+        $this->expectException(SyntaxError::class);
+
+        $this->expectExceptionMessage(
+            'Syntax error, expected one of "bar" in "foo" at offset 0 ("foo")'
+        );
+
+        $stream->extractFixedString('bar');
+    }
+
+    public function testExtracWsException(): void
+    {
+        $stream = new StringInputStream('foo');
+
+        $this->expectException(SyntaxError::class);
+
+        $this->expectExceptionMessage(
+            'Syntax error, expected one of "<whitespace>" in "foo" '
+                . 'at offset 0 ("foo")'
+        );
+
+        $stream->extractWs(true);
+    }
+
+    public function testExtractWsAndComments(): void
     {
         $text = <<<EOT
 Lorem ipsum dolor sit amet, ; first line
@@ -155,6 +188,33 @@ EOT;
 
         $stream = new StringInputStream('foo');
         $this->assertSame('foo', $stream->extractToken(',', true));
+    }
+
+    public function testExtractTokenException1(): void
+    {
+        $stream = new StringInputStream('"foo"bar');
+
+        $this->expectException(SyntaxError::class);
+
+        $this->expectExceptionMessage(
+            'Syntax error, expected one of "<whitespace>" in ""foo"bar" '
+                . 'at offset 5 ("bar")'
+        );
+
+        $stream->extractToken(null, true);
+    }
+
+    public function testExtractTokenException2(): void
+    {
+        $stream = new StringInputStream('"foo"bar');
+
+        $this->expectException(SyntaxError::class);
+
+        $this->expectExceptionMessage(
+            'Syntax error, expected one of ";" in ""foo"bar" at offset 5 ("bar")'
+        );
+
+        $stream->extractToken(';', true);
     }
 
     public function testEof()

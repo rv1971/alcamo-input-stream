@@ -2,7 +2,7 @@
 
 namespace alcamo\input_stream;
 
-use alcamo\exception\{Eof, Underflow};
+use alcamo\exception\{Eof, SyntaxError, Underflow};
 
 /**
  * @brief Seekable input stream made from a string
@@ -172,6 +172,32 @@ class StringInputStream implements SeekableInputStreamInterface
     }
 
     /**
+     * @brief Attempt to extract extactly $text
+     *
+     * @return $text if successful, `null` if at end of input
+     */
+    public function extractFixedString(string $text): ?string
+    {
+        /* @throw alcamo::exception::Eof if there are characters left but less
+         * than length of $text. */
+        $result = $this->extract(strlen($text));
+
+        if (isset($result) && $result != $text) {
+            /* @throw alcamo::exception::SyntaxError if extracted data
+             * differs from $text. */
+            throw (new SyntaxError())->setMessageContext(
+                [
+                    'inData' => $this->text_,
+                    'atOffset' => $this->offset_ - strlen($text),
+                    'expectedOneOf' => $text
+                ]
+            );
+        }
+
+        return $result;
+    }
+
+    /**
      * @brief Extract regular expression.
      *
      * @return Match $matchNo in the array of matches returned by
@@ -199,13 +225,25 @@ class StringInputStream implements SeekableInputStreamInterface
      * @brief Extract whitespace characters according to
      * alcamo::input_stream::StringInputStream::WS_CHARS
      */
-    public function extractWs(): ?string
+    public function extractWs(?bool $throwIfEmpty = null): ?string
     {
         if (!isset($this->text_[$this->offset_])) {
             return null;
         }
 
         $len = strspn($this->text_, static::WS_CHARS, $this->offset_);
+
+        if (!$len) {
+            /* @throw alcamo::exception::SyntaxError if $throwIfEmpty and
+             * there data to extract but no whitespace. */
+            throw (new SyntaxError())->setMessageContext(
+                [
+                    'inData' => $this->text_,
+                    'atOffset' => $this->offset_,
+                    'expectedOneOf' => '<whitespace>'
+                ]
+            );
+        }
 
         $result = substr($this->text_, $this->offset_, $len);
 
@@ -295,9 +333,9 @@ class StringInputStream implements SeekableInputStreamInterface
 
                 if ($extractSep) {
                     if (isset($sep)) {
-                        $this->extract(strlen($sep));
+                        $this->extractFixedString($sep);
                     } else {
-                        $this->extractWs();
+                        $this->extractWs(true);
                     }
                 }
 
