@@ -117,6 +117,28 @@ EOT;
         );
     }
 
+    public function testExtractUntilWs(): void
+    {
+        $text = "Lorem ipsum   dolor \t sit\x00 amet,\r\n"
+            . "consetetur  sadip\t\tscing";
+
+        $stream = new StringInputStream($text);
+
+        $this->assertSame('Lorem', $stream->extractUntilWs());
+        $this->assertSame(' ', $stream->extract());
+        $this->assertSame('ipsum   ', $stream->extractUntilWs(null, true));
+        $this->assertSame("dolor \t ", $stream->extractUntilWs(null, true));
+        $this->assertSame("sit", $stream->extractUntilWs(null, true, true));
+        $this->assertSame("amet,", $stream->extractUntilWs(null, true, true));
+        $this->assertSame("cons", $stream->extractUntilWs(4));
+        $this->assertSame("et", $stream->extractUntilWs(2, true));
+        $this->assertSame("etur ", $stream->extractUntilWs(5, true));
+        $this->assertSame(' ', $stream->extract());
+        $this->assertSame("sadip", $stream->extractUntilWs(6, true, true));
+        $this->assertSame("\t", $stream->extract());
+        $this->assertSame("scing", $stream->extractUntilWs());
+    }
+
     public function testExtractToken(): void
     {
         $stream = new StringInputStream("foo \"bar' baz\" 'qux \"quux'");

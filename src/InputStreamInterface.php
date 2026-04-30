@@ -43,7 +43,7 @@ interface InputStreamInterface
     public function putback(): void;
 
     /**
-     * @brief Extract characters up to a separator
+     * @brief Extract characters up to a separator or up to end of input
      *
      * @param $sep Separator string, may be more than one character.
      *

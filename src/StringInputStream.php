@@ -119,9 +119,9 @@ class StringInputStream implements SeekableInputStreamInterface
             }
 
             if (isset($maxCount) && $sepPos > $this->offset_ + $maxCount) {
-                $sepPos = $this->offset_ + $maxCount;
-
                 $result = substr($this->text_, $this->offset_, $maxCount);
+
+                $this->offset_ += $maxCount;
             } else {
                 $result = substr(
                     $this->text_,
@@ -130,9 +130,9 @@ class StringInputStream implements SeekableInputStreamInterface
                     ? $sepPos - $this->offset_ - strlen($sep)
                     : $sepPos - $this->offset_
                 );
-            }
 
-            $this->offset_ = $sepPos;
+                $this->offset_ = $sepPos;
+            }
         }
 
         return $result;
@@ -221,6 +221,49 @@ class StringInputStream implements SeekableInputStreamInterface
     public function extractWsAndComments(): ?string
     {
         return $this->extractRegexp(static::WS_AND_COMMENTS_REGEXP);
+    }
+
+    public function extractUntilWs(
+        ?int $maxCount = null,
+        ?bool $extractWs = null,
+        ?bool $discardWs = null
+    ): ?string {
+        if (!isset($this->text_[$this->offset_])) {
+            return null;
+        }
+
+        $dataLen = strcspn($this->text_, static::WS_CHARS, $this->offset_);
+        $totalLen = $dataLen;
+
+        if ($extractWs) {
+            $wsLen = strspn(
+                $this->text_,
+                static::WS_CHARS,
+                $this->offset_ + $dataLen
+            );
+
+            $totalLen += $wsLen;
+
+            if (!$discardWs) {
+                $dataLen += $wsLen;
+            }
+        }
+
+        if (isset($maxCount) && $totalLen > $maxCount) {
+            $result = substr(
+                $this->text_,
+                $this->offset_,
+                min($dataLen, $maxCount)
+            );
+
+            $this->offset_ += $maxCount;
+        } else {
+            $result = substr($this->text_, $this->offset_, $dataLen);
+
+            $this->offset_ += $totalLen;
+        }
+
+        return $result;
     }
 
     /**
