@@ -233,7 +233,7 @@ class StringInputStream implements SeekableInputStreamInterface
 
         $len = strspn($this->text_, static::WS_CHARS, $this->offset_);
 
-        if (!$len) {
+        if ($throwIfEmpty && !$len) {
             /* @throw alcamo::exception::SyntaxError if $throwIfEmpty and
              * there data to extract but no whitespace. */
             throw (new SyntaxError())->setMessageContext(
