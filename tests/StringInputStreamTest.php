@@ -101,6 +101,19 @@ EOT;
         $stream->extractFixedString('bar');
     }
 
+    public function testExtractFixedStringException(): void
+    {
+        $stream = new StringInputStream('');
+
+        $this->expectException(SyntaxError::class);
+
+        $this->expectExceptionMessage(
+            'Syntax error, expected one of "bar" in "" at offset 0 ("")'
+        );
+
+        $stream->extractFixedString('bar', true);
+    }
+
     public function testExtracWsException(): void
     {
         $stream = new StringInputStream('foo');

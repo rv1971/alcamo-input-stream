@@ -176,11 +176,25 @@ class StringInputStream implements SeekableInputStreamInterface
      *
      * @return $text if successful, `null` if at end of input
      */
-    public function extractFixedString(string $text): ?string
-    {
+    public function extractFixedString(
+        string $text,
+        ?bool $throwIfEmpty = null
+    ): ?string {
         /* @throw alcamo::exception::Eof if there are characters left but less
          * than length of $text. */
         $result = $this->extract(strlen($text));
+
+        if (!isset($result) && $throwIfEmpty) {
+            /* @throw alcamo::exception::SyntaxError if $throwIfEmpty and
+             * there are no data to extract. */
+            throw (new SyntaxError())->setMessageContext(
+                [
+                    'inData' => $this->text_,
+                    'atOffset' => $this->offset_,
+                    'expectedOneOf' => $text
+                ]
+            );
+        }
 
         if (isset($result) && $result != $text) {
             /* @throw alcamo::exception::SyntaxError if extracted data
