@@ -222,16 +222,26 @@ class StringInputStream implements SeekableInputStreamInterface
     }
 
     /**
-     * @brief Extract whitespace characters according to
-     * alcamo::input_stream::StringInputStream::WS_CHARS
+     * @brief Extract data made of characters from a set
+     *
+     * @param $characters Extract the longest string consisting enitrely in
+     * characters taken from this string.
+     *
+     * @param $throwIfEmpty Throw if the result is an empty string.
+     *
+     * @param $charactersLabel Human-readable label for the set of character,
+     * to be used in the exception message.
      */
-    public function extractWs(?bool $throwIfEmpty = null): ?string
-    {
+    public function extractCharactersFromSet(
+        string $characters,
+        ?bool $throwIfEmpty = null,
+        ?string $charactersLabel = null
+    ): ?string {
         if (!isset($this->text_[$this->offset_])) {
             return null;
         }
 
-        $len = strspn($this->text_, static::WS_CHARS, $this->offset_);
+        $len = strspn($this->text_, $characters, $this->offset_);
 
         if ($throwIfEmpty && !$len) {
             /* @throw alcamo::exception::SyntaxError if $throwIfEmpty and
@@ -240,7 +250,7 @@ class StringInputStream implements SeekableInputStreamInterface
                 [
                     'inData' => $this->text_,
                     'atOffset' => $this->offset_,
-                    'expectedOneOf' => '<whitespace>'
+                    'expectedOneOf' => "<$charactersLabel>" ?? $characters
                 ]
             );
         }
@@ -249,7 +259,30 @@ class StringInputStream implements SeekableInputStreamInterface
 
         $this->offset_ += $len;
 
-        return $result;
+        return $len ? $result : null;
+    }
+
+    /**
+     * @brief Extract whitespace characters according to
+     * alcamo::input_stream::StringInputStream::WS_CHARS
+     */
+    public function extractWs(?bool $throwIfEmpty = null): ?string
+    {
+        return $this->extractCharactersFromSet(
+            static::WS_CHARS,
+            $throwIfEmpty,
+            'whitespace'
+        );
+    }
+
+    /// Extract decimal digits
+    public function extractDecimalDigits(?bool $throwIfEmpty = null): ?string
+    {
+        return $this->extractCharactersFromSet(
+            '0123456789',
+            $throwIfEmpty,
+            'decimal-digits'
+        );
     }
 
     /**

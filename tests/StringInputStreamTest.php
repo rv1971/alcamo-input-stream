@@ -10,7 +10,7 @@ class StringInputStreamTest extends TestCase
     public function testBasics()
     {
         $text = <<<EOT
-Lorem ipsum dolor sit amet, consetetur     sadipscing elitr,
+Lorem ipsum dolor sit amet, consetetur42     sadipscing elitr,
 sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat,
 sed diam voluptua.
 EOT;
@@ -43,6 +43,8 @@ EOT;
             ' consetetu',
             $stream->extractUntil('r', null, true, true)
         );
+
+        $this->assertSame('42', $stream->extractDecimalDigits());
 
         $this->assertSame(' ', $stream->peek());
 
