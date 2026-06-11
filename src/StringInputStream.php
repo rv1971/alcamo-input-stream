@@ -299,6 +299,16 @@ class StringInputStream implements SeekableInputStreamInterface
         );
     }
 
+    /// Extract hexadecimal digits
+    public function extractHexDigits(?bool $throwIfEmpty = null): ?string
+    {
+        return $this->extractCharactersFromSet(
+            '0123456789ABCDEFabcdef',
+            $throwIfEmpty,
+            'decimal-digits'
+        );
+    }
+
     /**
      * @brief Extract whitespace and comments according to regexp
      * alcamo::input_stream::StringInputStream::WS_AND_COMMENTS_REGEXP
