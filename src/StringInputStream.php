@@ -382,7 +382,7 @@ class StringInputStream implements SeekableInputStreamInterface
                     if (isset($sep)) {
                         $this->extractFixedString($sep);
                     } else {
-                        $this->extractWs(true);
+                        $this->extractWs();
                     }
                 }
 

@@ -212,20 +212,6 @@ EOT;
         $this->expectException(SyntaxError::class);
 
         $this->expectExceptionMessage(
-            'Syntax error, expected one of "<whitespace>" in ""foo"bar" '
-                . 'at offset 5 ("bar")'
-        );
-
-        $stream->extractToken(null, true);
-    }
-
-    public function testExtractTokenException2(): void
-    {
-        $stream = new StringInputStream('"foo"bar');
-
-        $this->expectException(SyntaxError::class);
-
-        $this->expectExceptionMessage(
             'Syntax error, expected one of ";" in ""foo"bar" at offset 5 ("bar")'
         );
 
